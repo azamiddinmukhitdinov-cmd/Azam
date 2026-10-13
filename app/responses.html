@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f8f2ec">
+  <title>Её маленький намёк ♡</title>
+  <style>
+    :root{--paper:#f8f2ec;--wine:#873d50;--ink:#583038;--muted:#91747a;--line:#dcc9c6}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:radial-gradient(ellipse at 20% 30%,#f5e3e080,transparent 55%),var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100svh}.page{max-width:730px;padding:30px 24px 40px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:20px;font-size:10px;letter-spacing:1.8px;color:var(--muted)}a{color:var(--wine);text-underline-offset:4px;letter-spacing:0}.heading{text-align:center;margin:48px 0 28px}.eyebrow{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(36px,7vw,52px);font-weight:400;line-height:1.1;margin:17px 0}h1 em{color:var(--wine);font-weight:400}.sub{max-width:360px;margin:18px auto;color:var(--muted);font-size:13px;line-height:1.8}.card{background:#fffcf7;border:1px solid var(--line);border-radius:22px;padding:27px;margin:17px 0;box-shadow:0 12px 32px #59343e08}.empty{text-align:center;padding:38px 25px}.heart{font-family:Georgia,serif;color:var(--wine);font-size:40px}.card h2{font-family:Georgia,serif;font-weight:400;font-size:27px;margin:15px 0 12px}.card p{font-size:13px;line-height:1.8;overflow-wrap:anywhere}.wishes{white-space:pre-wrap;padding-top:15px;border-top:1px solid var(--line);margin-top:19px}.label{color:var(--muted);font-size:10px!important;letter-spacing:1.5px;text-transform:uppercase;margin:0}.time{font-size:11px!important;color:var(--muted);margin:18px 0 0}.cuisines{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}.tag{padding:9px 14px;border-radius:100px;background:#f0ddda;color:var(--wine);font-size:12px}.actions{text-align:center;margin-top:27px}button{border:0;font:inherit;font-size:13px;border-radius:100px;min-height:48px;padding:14px 26px;background:var(--wine);color:#fff7f1;cursor:pointer;touch-action:manipulation}button:disabled{opacity:.5;cursor:default}button:focus-visible,a:focus-visible{outline:3px solid var(--wine);outline-offset:4px}.status{font-size:12px;line-height:1.7;color:var(--muted);margin:14px auto;max-width:370px}.test{opacity:.8;box-shadow:none}.footer{font-size:10px;line-height:1.8;color:var(--muted);text-align:center;margin:33px auto 0;max-width:350px}.error{color:var(--wine)}@media(max-width:400px){.page{padding:24px 19px}.top{letter-spacing:1px;font-size:9px}.heading{margin-top:36px}.card{padding:23px}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top"><span>ТОЛЬКО ДЛЯ ТЕБЯ ♡</span><a href="/">Открыть приглашение</a></header>
+    <main>
+      <div class="heading"><p class="eyebrow">Наш вечер · 18 октября</p><h1>Её маленький<br><em>намёк для тебя.</em></h1><p class="sub">Здесь появятся выбранная кухня и пожелания Лианночки. Ей достаточно сохранить выбор в приглашении ♡</p></div>
+      <div id="response-list" aria-live="polite"><div class="card empty"><span class="heart" aria-hidden="true">♡</span><h2>Заглянем в её письмо…</h2></div></div>
+      <div class="actions"><button id="refresh" type="button">Проверить её ответ ♡</button><p class="status" id="status" role="status"></p></div>
+    </main>
+    <p class="footer">Страница открыта только тебе.<br>Пока она открыта, ответы обновляются автоматически.</p>
+  </div>
+  <script>
+    'use strict';
+    const names={japanese:'Японская',national:'Национальная',italian:'Итальянская',other:'Свой вариант',surprise:'Доверяет твоему вкусу ♡'};
+    const $=id=>document.getElementById(id);
+    let loading=false,lastSnapshot='';
+    function emptyCard(){const card=document.createElement('div');card.className='card empty';const heart=document.createElement('span');heart.className='heart';heart.textContent='♡';heart.setAttribute('aria-hidden','true');const title=document.createElement('h2');title.textContent='Пока ждём её маленький намёк';const description=document.createElement('p');description.textContent='Когда Лианночка сохранит свой выбор, он появится здесь. Сообщение отправлять не нужно.';card.append(heart,title,description);return card;}
+    function responseCard(response){
+      const card=document.createElement('article');card.className='card'+(response.isTest?' test':'');
+      const label=document.createElement('p');label.className='label';label.textContent=response.isTest?'Твой пробный ответ':'Лианночка сказала «да» ♡';card.append(label);
+      const title=document.createElement('h2');title.textContent=response.isTest?'Твой выбор в приглашении':'Вот чего ей хочется';card.append(title);
+      if(response.cuisines.length){const tags=document.createElement('div');tags.className='cuisines';response.cuisines.forEach(value=>{const tag=document.createElement('span');tag.className='tag';tag.textContent=names[value]||value;tags.append(tag);});card.append(tags);}
+      if(response.wishes){const wishes=document.createElement('p');wishes.className='wishes';wishes.textContent='А ещё: '+response.wishes;card.append(wishes);}
+      if(response.isTest){const note=document.createElement('p');note.textContent='Это ответ, который ты сохранил со своего аккаунта. Её ответ появится отдельно.';card.append(note);}
+      const time=document.createElement('p');time.className='time';time.textContent='Сохранено '+new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Samarkand'}).format(new Date(response.updatedAt));card.append(time);
+      return card;
+    }
+    async function refresh(){
+      if(loading)return;loading=true;$('refresh').disabled=true;
+      try{
+        const result=await fetch('/api/owner/preferences',{credentials:'same-origin',cache:'no-store'});
+        const data=await result.json();
+        if(!result.ok)throw new Error(data.error||'Не получилось прочитать ответ.');
+        const snapshot=JSON.stringify(data.responses);
+        if(snapshot!==lastSnapshot){
+          const real=data.responses.filter(response=>!response.isTest),tests=data.responses.filter(response=>response.isTest);
+          const cards=real.length?real.map(responseCard):[emptyCard()];
+          cards.push(...tests.map(responseCard));$('response-list').replaceChildren(...cards);lastSnapshot=snapshot;
+        }
+        $('status').classList.remove('error');$('status').textContent='Проверено только что. Обновлю ещё раз через 20 секунд ♡';
+      }catch(error){$('status').classList.add('error');$('status').textContent=error.message||'Не получилось прочитать ответ. Попробуй ещё раз.';}
+      finally{loading=false;$('refresh').disabled=false;}
+    }
+    $('refresh').addEventListener('click',refresh);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+    setInterval(()=>{if(!document.hidden)refresh();},20000);
+    refresh();
+  </script>
+</body>
+</html>
