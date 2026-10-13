@@ -146,6 +146,46 @@
     function celebrate(){if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;const box=$('confetti');box.replaceChildren();for(let i=0;i<26;i++){const petal=document.createElement('span');petal.className='petal';petal.textContent=i%3===0?'♡':'♥';petal.style.left=(Math.random()*100)+'%';petal.style.fontSize=(12+Math.random()*15)+'px';petal.style.opacity=String(.25+Math.random()*.4);petal.style.animationDuration=(3+Math.random()*2)+'s';petal.style.animationDelay=(Math.random()*.7)+'s';box.append(petal)}setTimeout(()=>box.replaceChildren(),6500);}
     $('accept').addEventListener('click',()=>{show(3);celebrate()});
     const preferenceKey='liannochka-date-preferences-v1';
+    const PREFERENCES_ENDPOINT='/api/public/preferences';
+    const RESPONSE_TOKEN_KEY='liannochka-public-response-token-v1';
+    let memoryResponseToken='';
+    function responseToken(){
+      if(memoryResponseToken)return memoryResponseToken;
+      try{
+        const stored=localStorage.getItem(RESPONSE_TOKEN_KEY);
+        if(typeof stored==='string'&&/^[a-f0-9]{64}$/.test(stored))memoryResponseToken=stored;
+      }catch{}
+      if(!memoryResponseToken){
+        if(!window.crypto||typeof window.crypto.getRandomValues!=='function')throw new Error('Открой письмо по защищённой ссылке HTTPS, чтобы сохранить свой намёк ♡');
+        const bytes=new Uint8Array(32);
+        window.crypto.getRandomValues(bytes);
+        memoryResponseToken=Array.from(bytes,value=>value.toString(16).padStart(2,'0')).join('');
+        try{localStorage.setItem(RESPONSE_TOKEN_KEY,memoryResponseToken);}catch{}
+      }
+      return memoryResponseToken;
+    }
+    async function requestPreferences(method,choice){
+      const token=responseToken();
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),12000);
+      try{
+        const headers={'X-Invitation-Token':token};
+        if(method==='POST')headers['Content-Type']='application/json';
+        const response=await fetch(PREFERENCES_ENDPOINT,{
+          method,credentials:'omit',cache:'no-store',headers,signal:controller.signal,
+          ...(method==='POST'?{body:JSON.stringify(choice)}:{})
+        });
+        let result;
+        try{result=await response.json();}
+        catch{throw new Error('Не получилось прочитать ответ. Попробуй ещё раз ♡');}
+        if(!response.ok)throw new Error(typeof result.error==='string'?result.error:'Не получилось сохранить твой намёк. Попробуй ещё раз ♡');
+        return result;
+      }catch(error){
+        if(controller.signal.aborted)throw new Error('Сохранение заняло слишком много времени. Проверь интернет и попробуй ещё раз ♡');
+        if(error instanceof TypeError)throw new Error('Проверь интернет и попробуй сохранить свой намёк ещё раз ♡');
+        throw error;
+      }finally{clearTimeout(timeout);}
+    }
     let preferenceDirty=false,savingPreferences=false;
     const cuisineNames={japanese:'Японская',national:'Национальная',italian:'Итальянская',other:'Свой вариант',surprise:'Доверяю твоему вкусу ♡'};
     const cuisineInputs=Array.from(document.querySelectorAll('input[name="cuisine"]'));
@@ -188,11 +228,9 @@
       $('preference-status').textContent='Ещё мгновение — и твой намёк будет у меня ♡';
       let errorMessage='';
       try{
-        const response=await fetch('/api/preferences',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(choice)});
-        const result=await response.json();
-        if(!response.ok)throw new Error(result.error||'Не получилось сохранить твой намёк. Попробуй ещё раз ♡');
+        const result=await requestPreferences('POST',choice);
         const saved=result.preferences;
-        if(!saved||!Array.isArray(saved.cuisines))throw new Error('Не получилось подтвердить сохранение. Попробуй ещё раз ♡');
+        if(!saved||!Array.isArray(saved.cuisines)||!saved.cuisines.every(value=>typeof value==='string'&&Object.hasOwn(cuisineNames,value))||typeof saved.wishes!=='string')throw new Error('Не получилось подтвердить сохранение. Попробуй ещё раз ♡');
         $('ticket-cuisine').textContent=saved.cuisines.length?saved.cuisines.map(value=>cuisineNames[value]).join(' · '):'Расскажу в своих пожеланиях ♡';
         $('ticket-wishes').textContent=saved.wishes?'А ещё: '+saved.wishes:'';
         $('ticket-wishes').hidden=!saved.wishes;
@@ -210,10 +248,8 @@
     $('edit-preferences').addEventListener('click',()=>show(3));
     async function loadSavedPreferences(){
       try{
-        const response=await fetch('/api/preferences',{credentials:'same-origin',cache:'no-store'});
-        if(!response.ok)return;
-        const result=await response.json(),saved=result.preferences;
-        if(!saved||!Array.isArray(saved.cuisines)||preferenceDirty||savingPreferences||stage>=3)return;
+        const result=await requestPreferences('GET'),saved=result.preferences;
+        if(!saved||!Array.isArray(saved.cuisines)||!saved.cuisines.every(value=>typeof value==='string'&&Object.hasOwn(cuisineNames,value))||typeof saved.wishes!=='string'||preferenceDirty||savingPreferences||stage>=3)return;
         cuisineInputs.forEach(input=>input.checked=saved.cuisines.includes(input.value));
         $('food-wishes').value=typeof saved.wishes==='string'?saved.wishes.slice(0,500):'';
         updatePreferences();
