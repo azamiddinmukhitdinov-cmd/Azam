@@ -1,0 +1,19 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Love Letter//Date Invitation//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Наше свидание ♡
+BEGIN:VEVENT
+UID:liannochka-20261018@love-letter
+DTSTAMP:20261013T082557Z
+DTSTART;VALUE=DATE:20261018
+DTEND;VALUE=DATE:20261019
+SUMMARY:Свидание с любимым ♡
+DESCRIPTION:Лианночка! Оставь этот день для на
+ с двоих. Место и план — сюрприз. Время со
+ общу отдельно.
+STATUS:TENTATIVE
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
