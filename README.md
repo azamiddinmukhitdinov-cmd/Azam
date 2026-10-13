@@ -1,8 +1,8 @@
-# Azam — Письмо для Лианночки ♡
+# Azam — Лианночка — маленький секрет
 
 Интерактивное приглашение на свидание 18 октября 2026 года: конверт, дата знакомства, выбор кухни, пожелания и сохранение даты в календарь. Гостю не нужен аккаунт GitHub или ChatGPT. Выбранный ответ автоматически отправляется владельцу и сохраняется в Cloudflare D1.
 
-Приглашение и сервер ответов: https://liannochka-secret-date.creamy-bream-2918.chatgpt.site
+Приглашение и сервер ответов: https://liannochka-malenkiy-sekret.creamy-bream-2918.chatgpt.site
 
 Адрес после включения GitHub Pages: https://azamiddinmukhitdinov-cmd.github.io/Azam/
 
@@ -49,6 +49,6 @@ pnpm build
 
 ## Ответы и сервер
 
-Гостевые ответы сохраняются без входа через `/api/public/preferences`. Случайный токен в браузере позволяет получить и изменить собственный ответ. Страница владельца https://liannochka-secret-date.creamy-bream-2918.chatgpt.site/responses требует входа в ChatGPT и проверки `OWNER_EMAIL`; пример переменной есть в `.env.example`.
+Гостевые ответы сохраняются без входа через `/api/public/preferences`. Случайный токен в браузере позволяет получить и изменить собственный ответ. Страница владельца https://liannochka-malenkiy-sekret.creamy-bream-2918.chatgpt.site/responses требует входа в ChatGPT и проверки `OWNER_EMAIL`; пример переменной есть в `.env.example`.
 
 Сервер работает в Sites на Cloudflare Workers с D1 и привязкой `DB`. Локально для сохранения нужна настроенная D1, а для страницы владельца — доверенная идентификация Sites. `.openai/hosting.json` сохраняет связь с существующим Sites-проектом. Подробности сборки, локальных миграций и окружения: [docs/sites-runtime.md](docs/sites-runtime.md).

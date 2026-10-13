@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { calendarFileName, invitationCalendar } from "../lib/invitation-calendar.mjs";
 
 const root = new URL("../", import.meta.url);
-const endpoint = "https://liannochka-secret-date.creamy-bream-2918.chatgpt.site/api/public/preferences";
+const endpoint = "https://liannochka-malenkiy-sekret.creamy-bream-2918.chatgpt.site/api/public/preferences";
 let invitation = await readFile(new URL("app/invitation.html", root), "utf8");
 const marker = "const PREFERENCES_ENDPOINT='/api/public/preferences';";
 if (!invitation.includes(marker)) throw new Error("Public invitation endpoint marker is missing");

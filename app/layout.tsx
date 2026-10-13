@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Для тебя, Лианночка ♡",
-  description: "Одно маленькое письмо. Одно особенное свидание.",
+  title: "Лианночка — маленький секрет",
+  description: "Лианночка, один маленький секрет только для тебя ♡",
   robots: { index: false, follow: false },
   icons: {
     icon: "/favicon.svg",
